@@ -10,22 +10,23 @@ public class RadialTranslateSystem : BulletPattern<RadialTranslate>
         {
             var t = entity.transform;
             t.RotateAround(
-                entity.Component.Origin,
+                entity.BulletInfo.Origin,
                 Vector3.forward,
                 360 * entity.Component.RadialSpeed * Time.deltaTime
             );
-            var direction = (t.position - entity.Component.Origin).normalized;
             t.Translate(
-                entity.Component.RadiusSpeed * Vector3.right * Time.deltaTime, 
+                entity.Component.RadiusSpeed * Vector3.right * Time.deltaTime,
                 Space.Self
             );
         }
     }
 }
 
-public class RadialTranslate : BulletInfo
+public class RadialTranslate : MonoBehaviour, IResetable
 {
     public float RadialSpeed, RadiusSpeed;
 
-    public override void Reset(){}
+    public void Disable() { }
+
+    public void Enable() { }
 }

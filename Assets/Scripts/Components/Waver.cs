@@ -18,7 +18,7 @@ public class WaverSystem : BulletPattern<Waver>
 
             c.Time += Time.deltaTime / c.Period;
             var offset = Mathf.Sin(Mathf.PI * 2 * c.Time) * c.Amplitude;
-            t.position += 
+            t.position +=
                 t.TransformDirection(
                     c.Direction
                 ) * (
@@ -29,14 +29,16 @@ public class WaverSystem : BulletPattern<Waver>
     }
 }
 
-public class Waver : BulletInfo
+public class Waver : MonoBehaviour, IResetable
 {
     public float Period, Amplitude;
     public Vector3 Direction;
     [HideInInspector]
     public float Time, Offset;
 
-    public override void Reset()
+    public void Disable() { }
+
+    public void Enable()
     {
         Time = 0;
         Offset = 0;

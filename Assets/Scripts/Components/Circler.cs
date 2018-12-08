@@ -34,7 +34,7 @@ public class CirclerSystem : BulletPattern<Circler>
     }
 }
 
-public class Circler : BulletInfo
+public class Circler : MonoBehaviour, IResetable
 {
     public float Period, Amplitude;
     [HideInInspector]
@@ -42,9 +42,11 @@ public class Circler : BulletInfo
     [HideInInspector]
     public Vector3 Offset;
 
-    public override void Reset()
+    public void Disable()
     {
         Time = 0;
         Offset = Vector3.right * Amplitude;
     }
+
+    public void Enable() { }
 }

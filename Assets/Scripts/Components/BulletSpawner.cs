@@ -21,7 +21,7 @@ public class BulletSpawnerSystem : ComponentSystem
             {
                 bs.Time -= bs.FireRate;
                 var bullet = bs.Cache.Get();
-                bullet.obj.SetValues(
+                bullet.Obj.SetValues(
                     entity.Transform.position,
                     entity.Transform.rotation
                 );
@@ -32,7 +32,7 @@ public class BulletSpawnerSystem : ComponentSystem
                 }
 
 
-                bullet.obj.Enable();
+                bullet.Obj.Enable();
             }
         }
     }
@@ -78,36 +78,39 @@ public class BulletSpawner : MonoBehaviour
 public struct Bullet : IInitializable, IResetable, IDestroyable
 {
     private GameObject GameObject;
-    private BulletInfo[] BulletInfo;
+    private BulletInfo BulletInfo;
+    private IResetable[] Resetables;
 
     public void SetValues(Vector3 origin, Quaternion rotation)
     {
-        for(int i = 0; i<BulletInfo.Length; i++)
-        {
-            BulletInfo[i].Origin = origin;
-        }
+        BulletInfo.Origin = origin;
         GameObject.transform.position = origin;
         GameObject.transform.rotation = rotation;
     }
 
     public void Disable()
     {
+        for (int i = 0; i < Resetables.Length; i++)
+        {
+            Resetables[i].Disable();
+        }
         GameObject.SetActive(false);
     }
 
     public void Enable()
     {
         GameObject.SetActive(true);
-        for(int i = 0; i<BulletInfo.Length; i++)
+        for (int i = 0; i < Resetables.Length; i++)
         {
-            BulletInfo[i].Reset();
+            Resetables[i].Enable();
         }
     }
 
     public void Init(GameObject gameObject)
     {
         GameObject = gameObject;
-        BulletInfo = gameObject.GetComponents<BulletInfo>();
+        BulletInfo = gameObject.GetComponent<BulletInfo>();
+        Resetables = gameObject.GetComponents<IResetable>();
     }
 
     public void Destroy()

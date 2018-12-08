@@ -5,7 +5,7 @@ using GameObject = UnityEngine.GameObject;
 
 public class Cache<T> where T : IInitializable, IResetable, IDestroyable, new()
 {
-    private GameObject _prefab;
+    private readonly GameObject _prefab;
     private Stack<T> _objects = new Stack<T>();
 
     private Cache(GameObject prefab)
@@ -65,19 +65,19 @@ public class Cache<T> where T : IInitializable, IResetable, IDestroyable, new()
 
     public struct CachedObject
     {
-        public T obj { get; private set; }
+        public T Obj { get; private set; }
         private Cache<T> _cache;
 
         public CachedObject(Cache<T> cache, T obj)
         {
             _cache = cache;
-            this.obj = obj;
+            this.Obj = obj;
         }
 
         public void Put()
         {
-            _cache.Set(obj);
-            obj = default(T);
+            _cache.Set(Obj);
+            Obj = default(T);
         }
     }
 }

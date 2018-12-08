@@ -4,19 +4,12 @@ using Unity.Entities;
 using UnityEngine;
 
 public abstract class BulletPattern<T> : ComponentSystem
-    where T : BulletInfo
+    where T : MonoBehaviour, IResetable
 {
     public struct Components
     {
+        public BulletInfo BulletInfo;
         public T Component;
         public Transform transform;
     }
-}
-
-public abstract class BulletInfo : MonoBehaviour
-{
-    [HideInInspector]
-    public Vector3 Origin;
-
-    public abstract void Reset();
 }
