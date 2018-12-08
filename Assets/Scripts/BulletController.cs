@@ -132,9 +132,9 @@ public class BulletController : MonoBehaviour
 
         _spawner.Init(_spawnedPrefab);
 
-        if (_spawnedPrefab)
+        if (oldPrefab)
         {
-            var cache = Cache<Bullet>.GetCache(_spawnedPrefab);
+            var cache = Cache<Bullet>.GetCache(oldPrefab);
             cache.Clear();
             Destroy(oldPrefab);
         }
