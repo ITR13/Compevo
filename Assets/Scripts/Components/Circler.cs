@@ -1,10 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Entities;
+using Unity.Jobs;
 using UnityEngine;
 
-public class CirclerSystem : BulletPattern<Circler>
+public class CirclerSystem
 {
-    protected override void OnUpdate()
+    /*protected void OnUpdate()
     {
         foreach (var entity in GetEntities<Components>())
         {
@@ -31,10 +33,10 @@ public class CirclerSystem : BulletPattern<Circler>
 
             c.Offset = offset;
         }
-    }
+    }*/
 }
 
-public class Circler : MonoBehaviour, IResetable
+public struct Circler : IComponentData, IResetable
 {
     public float Period, Amplitude;
     [HideInInspector]

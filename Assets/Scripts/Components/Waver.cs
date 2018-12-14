@@ -1,10 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Entities;
+using Unity.Jobs;
 using UnityEngine;
 
-public class WaverSystem : BulletPattern<Waver>
+
+public class WaverSystem
 {
-    protected override void OnUpdate()
+    /*protected void OnUpdate()
     {
         foreach (var entity in GetEntities<Components>())
         {
@@ -26,10 +29,10 @@ public class WaverSystem : BulletPattern<Waver>
                 );
             c.Offset = offset;
         }
-    }
+    }*/
 }
 
-public class Waver : MonoBehaviour, IResetable
+public struct Waver : IComponentData, IResetable
 {
     public float Period, Amplitude;
     public Vector3 Direction;

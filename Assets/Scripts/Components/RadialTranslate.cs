@@ -1,32 +1,64 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Entities;
+using Unity.Jobs;
+using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 
-public class RadialTranslateSystem : BulletPattern<RadialTranslate>
+public class RadialTranslateSystem : JobComponentSystem
 {
-    protected override void OnUpdate()
+
+
+    protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
-        foreach (var entity in GetEntities<Components>())
+        var job = new RadialTranslateJob
         {
-            var t = entity.transform;
-            t.RotateAround(
-                entity.BulletInfo.Origin,
-                Vector3.forward,
-                360 * entity.Component.RadialSpeed * Time.deltaTime
-            );
-            t.Translate(
-                entity.Component.RadiusSpeed * Vector3.right * Time.deltaTime,
-                Space.Self
-            );
+            DeltaTime = Time.deltaTime
+        };
+        return job.Schedule(this, inputDeps);
+    }
+
+    private struct RadialTranslateJob : IJobProcessComponentData<
+        RadialTranslate,
+        Position
+    >
+    {
+        [ReadOnly]
+        public float DeltaTime;
+
+        public void Execute(
+            ref RadialTranslate radialTranslate,
+            ref Position position
+        )
+        {
+            radialTranslate.RadialTime +=
+                DeltaTime * radialTranslate.RadialSpeed * Mathf.PI * 2;
+            radialTranslate.RadiusTime +=
+                DeltaTime * radialTranslate.RadiusSpeed;
+
+            var pos =
+                new float3(
+                    math.cos(radialTranslate.RadialTime),
+                    math.sin(radialTranslate.RadialTime),
+                    0
+                ) * radialTranslate.RadiusTime;
+
+            position.Value += pos - radialTranslate.Position;
+            radialTranslate.Position = pos;
         }
     }
 }
 
-public class RadialTranslate : MonoBehaviour, IResetable
+[Serializable]
+public struct RadialTranslate : IComponentData
 {
     public float RadialSpeed, RadiusSpeed;
-
-    public void Disable() { }
-
-    public void Enable() { }
+    public float StartingRotation;
+    [HideInInspector]
+    public float RadialTime, RadiusTime;
+    [HideInInspector]
+    public float3 Position;
 }

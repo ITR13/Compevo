@@ -1,121 +1,59 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Entities;
+using Unity.Jobs;
+using Unity.Rendering;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class BulletSpawnerSystem : ComponentSystem
 {
-    private struct Entity
+    private class BulletSpawnerBarrier : BarrierSystem { };
+    [Inject] BulletSpawnerBarrier barrier = null;
+    public static Mesh Mesh;
+    public static Material Material;
+    
+    private struct BulletSpawnerComponents
     {
-        public BulletSpawner BulletSpawner;
-        public Transform Transform;
+        public unsafe BulletSpawner* BulletSpawner;
     }
 
-    protected override void OnUpdate()
+    protected unsafe override void OnUpdate()
     {
-        foreach (var entity in GetEntities<Entity>())
+        var entities = GetEntities<BulletSpawnerComponents>();
+        var DeltaTime = Time.deltaTime;
+        var CommandBuffer = barrier.CreateCommandBuffer();
+        foreach (var entity in entities)
         {
             var bs = entity.BulletSpawner;
-            bs.Time += Time.deltaTime;
-            if (bs.Time >= bs.FireRate)
+            (*bs).Time += DeltaTime * (*bs).FireRate;
+            if ((*bs).Time >= 1)
             {
-                bs.Time -= bs.FireRate;
-                var bullet = bs.Cache.Get();
-                bullet.Obj.SetValues(
-                    entity.Transform.position,
-                    entity.Transform.rotation
+                (*bs).Time -= 1;
+                CommandBuffer.CreateEntity(
+                    (*bs).Prefab.Archetype
                 );
-                bs.Bullets.Enqueue(bullet);
-                if (bs.Bullets.Count > 200)
-                {
-                    bs.Bullets.Dequeue().Put();
-                }
-
-
-                bullet.Obj.Enable();
+                CommandBuffer.SetComponent(
+                    (*bs).Prefab.RadialTranslate
+                );
+                CommandBuffer.SetSharedComponent(
+                    new MeshInstanceRenderer
+                    {
+                        mesh = Mesh,
+                        material = Material,
+                    }
+                );
             }
         }
     }
 }
 
-public class BulletSpawner : MonoBehaviour
+public struct BulletSpawner : IComponentData
 {
-    public GameObject Prefab;
     public float FireRate;
+    public EntityPrefab Prefab;
+    public int MeshId;
     [HideInInspector]
     public float Time;
-    [HideInInspector]
-    public Cache<Bullet> Cache;
-    [HideInInspector]
-    public Queue<Cache<Bullet>.CachedObject> Bullets;
-
-    private void Awake()
-    {
-        Bullets = new Queue<Cache<Bullet>.CachedObject>();
-        Cache = Cache<Bullet>.GetCache(Prefab);
-    }
-
-    public void Init(GameObject prefab)
-    {
-        Prefab = prefab;
-        foreach (var bullet in Bullets)
-        {
-            bullet.Put();
-        }
-        Bullets.Clear();
-
-        if (prefab)
-        {
-            Cache = Cache<Bullet>.GetCache(Prefab);
-        }
-        else
-        {
-            Cache = null;
-        }
-    }
-}
-
-public struct Bullet : IInitializable, IResetable, IDestroyable
-{
-    private GameObject GameObject;
-    private BulletInfo BulletInfo;
-    private IResetable[] Resetables;
-
-    public void SetValues(Vector3 origin, Quaternion rotation)
-    {
-        BulletInfo.Origin = origin;
-        GameObject.transform.position = origin;
-        GameObject.transform.rotation = rotation;
-    }
-
-    public void Disable()
-    {
-        for (int i = 0; i < Resetables.Length; i++)
-        {
-            Resetables[i].Disable();
-        }
-        GameObject.SetActive(false);
-    }
-
-    public void Enable()
-    {
-        GameObject.SetActive(true);
-        for (int i = 0; i < Resetables.Length; i++)
-        {
-            Resetables[i].Enable();
-        }
-    }
-
-    public void Init(GameObject gameObject)
-    {
-        GameObject = gameObject;
-        BulletInfo = gameObject.GetComponent<BulletInfo>();
-        Resetables = gameObject.GetComponents<IResetable>();
-    }
-
-    public void Destroy()
-    {
-        Object.Destroy(GameObject);
-        BulletInfo = null;
-    }
 }
