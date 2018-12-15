@@ -243,9 +243,18 @@ MonoBehaviour:
         y: 0
         z: 0
     Circler:
-      Frequency: 1
+      Frequency: 0.6
       Amplitude: 4
       Time: 0
+      Position:
+        x: 0
+        y: 0
+        z: 0
+    Waver:
+      Frequency: 0.15
+      Amplitude: 9
+      Time: 0
+      Rotation: 0
       Position:
         x: 0
         y: 0

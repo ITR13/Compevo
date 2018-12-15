@@ -32,6 +32,7 @@ public class Bootstrap : MonoBehaviour
                 ComponentType.Create<Rotation>(),
                 ComponentType.Create<RadialTranslate>(),
                 ComponentType.Create<Circler>(),
+                ComponentType.Create<Waver>(),
                 ComponentType.Create<MeshInstanceRenderer>(),
                 ComponentType.Create<LocalToWorld>()
             );
@@ -67,4 +68,5 @@ public struct EntityPrefab
     public EntityArchetype Archetype;
     public RadialTranslate RadialTranslate;
     public Circler Circler;
+    public Waver Waver;
 }

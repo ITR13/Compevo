@@ -1,49 +1,60 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 
 
-public class WaverSystem
+public class WaverSystem : JobComponentSystem
 {
-    /*protected void OnUpdate()
+    protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
-        foreach (var entity in GetEntities<Components>())
+        var job = new WaverJob
         {
-            var t = entity.transform;
-            var c = entity.Component;
+            DeltaTime = Time.deltaTime
+        };
+        return job.Schedule(this, inputDeps);
+    }
 
-            if (c.Period <= 0 || c.Amplitude == 0)
-            {
-                continue;
-            }
+    private struct WaverJob : IJobProcessComponentData<
+        Waver,
+        Position
+    >
+    {
+        [ReadOnly]
+        public float DeltaTime;
 
-            c.Time += Time.deltaTime / c.Period;
-            var offset = Mathf.Sin(Mathf.PI * 2 * c.Time) * c.Amplitude;
-            t.position +=
-                t.TransformDirection(
-                    c.Direction
-                ) * (
-                    offset - c.Offset
-                );
-            c.Offset = offset;
+        public void Execute(ref Waver waver, ref Position position)
+        {
+            waver.Time += DeltaTime * waver.Frequency;
+
+            var distance = math.sin(
+                Mathf.PI * 2 * waver.Time
+            ) * waver.Amplitude;
+
+            var pos =
+                new float3(
+                    math.cos(waver.Rotation),
+                    math.sin(waver.Rotation),
+                    0
+                ) * distance;
+
+            position.Value += pos - waver.Position;
+            waver.Position = pos;
         }
-    }*/
+    }
 }
 
-public struct Waver : IComponentData, IResetable
+[Serializable]
+public struct Waver : IComponentData
 {
-    public float Period, Amplitude;
-    public Vector3 Direction;
+    public float Frequency, Amplitude;
     [HideInInspector]
-    public float Time, Offset;
-
-    public void Disable() { }
-
-    public void Enable()
-    {
-        Time = 0;
-        Offset = 0;
-    }
+    public float Time, Rotation;
+    [HideInInspector]
+    public float3 Position;
 }

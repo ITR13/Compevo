@@ -40,6 +40,9 @@ public class BulletSpawnerSystem : ComponentSystem
                 CommandBuffer.SetComponent(
                     (*bs).Prefab.Circler
                 );
+                CommandBuffer.SetComponent(
+                    (*bs).Prefab.Waver
+                );
                 CommandBuffer.SetSharedComponent(
                     new MeshInstanceRenderer
                     {
