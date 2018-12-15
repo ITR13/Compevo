@@ -184,7 +184,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 534669902}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -512}
+  m_LocalPosition: {x: 0, y: 1, z: -128}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -230,16 +230,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c285e3f2fcca3f0468775c85af571801, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fireRate: 16
-  _radialTranslate:
-    RadialSpeed: 0.2
-    RadiusSpeed: 2
-    StartingRotation: 0.25
-    RadialTime: 0
-    RadiusTime: 0
-    Position:
-      x: 0
-      y: 0
-      z: 0
+  _fireRate: 2
+  _entityPrefab:
+    RadialTranslate:
+      RadialSpeed: 0.2
+      RadiusSpeed: 3
+      StartingRotation: 0
+      RadialTime: 0
+      RadiusTime: 0
+      Position:
+        x: 0
+        y: 0
+        z: 0
+    Circler:
+      Frequency: 1
+      Amplitude: 4
+      Time: 0
+      Position:
+        x: 0
+        y: 0
+        z: 0
   _mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
   _material: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}

@@ -10,8 +10,6 @@ using UnityEngine;
 
 public class RadialTranslateSystem : JobComponentSystem
 {
-
-
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
         var job = new RadialTranslateJob

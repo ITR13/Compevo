@@ -1,4 +1,5 @@
-﻿using Unity.Entities;
+﻿using System;
+using Unity.Entities;
 using Unity.Rendering;
 using Unity.Transforms;
 using UnityEngine;
@@ -8,7 +9,7 @@ public class Bootstrap : MonoBehaviour
     [SerializeField]
     private float _fireRate = 1;
     [SerializeField]
-    private RadialTranslate _radialTranslate;
+    EntityPrefab _entityPrefab;
     [SerializeField]
     private Mesh _mesh;
     [SerializeField]
@@ -19,41 +20,28 @@ public class Bootstrap : MonoBehaviour
         BulletSpawnerSystem.Mesh = _mesh;
         BulletSpawnerSystem.Material = _material;
 
-
         var entityManager = World.Active.GetOrCreateManager<EntityManager>();
         var entity = entityManager.CreateEntity(
             ComponentType.Create<BulletSpawner>(),
-            ComponentType.Create<MeshInstanceRenderer>(),
             ComponentType.Create<Position>(),
-            ComponentType.Create<Rotation>(),
-            ComponentType.Create<Scale>()
+            ComponentType.Create<Rotation>()
         );
         var bullet =
             entityManager.CreateArchetype(
                 ComponentType.Create<Position>(),
                 ComponentType.Create<Rotation>(),
                 ComponentType.Create<RadialTranslate>(),
+                ComponentType.Create<Circler>(),
                 ComponentType.Create<MeshInstanceRenderer>(),
                 ComponentType.Create<LocalToWorld>()
             );
+        _entityPrefab.Archetype = bullet;
         entityManager.SetComponentData(
             entity,
             new BulletSpawner
             {
-                Prefab = new EntityPrefab
-                {
-                    Archetype = bullet,
-                    RadialTranslate = _radialTranslate,
-                },
+                Prefab = _entityPrefab,
                 FireRate = _fireRate,
-            }
-        );
-        entityManager.SetSharedComponentData(
-            entity,
-            new MeshInstanceRenderer
-            {
-                mesh = _mesh,
-                material = _material
             }
         );
         entityManager.SetComponentData(
@@ -70,18 +58,13 @@ public class Bootstrap : MonoBehaviour
                 Value = Quaternion.identity
             }
         );
-        entityManager.SetComponentData(
-            entity,
-            new Scale
-            {
-                Value = Vector3.one
-            }
-        );
     }
 }
 
+[Serializable]
 public struct EntityPrefab
 {
     public EntityArchetype Archetype;
     public RadialTranslate RadialTranslate;
+    public Circler Circler;
 }

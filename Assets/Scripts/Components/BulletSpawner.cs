@@ -37,6 +37,9 @@ public class BulletSpawnerSystem : ComponentSystem
                 CommandBuffer.SetComponent(
                     (*bs).Prefab.RadialTranslate
                 );
+                CommandBuffer.SetComponent(
+                    (*bs).Prefab.Circler
+                );
                 CommandBuffer.SetSharedComponent(
                     new MeshInstanceRenderer
                     {

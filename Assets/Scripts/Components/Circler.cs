@@ -1,54 +1,59 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 
-public class CirclerSystem
+public class CirclerSystem : JobComponentSystem
 {
-    /*protected void OnUpdate()
+    protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
-        foreach (var entity in GetEntities<Components>())
+        var job = new CirclerJob
         {
-            var t = entity.transform;
-            var c = entity.Component;
+            DeltaTime = Time.deltaTime
+        };
+        return job.Schedule(this, inputDeps);
+    }
 
-            if (c.Period <= 0 || c.Amplitude == 0)
-            {
-                continue;
-            }
+    private struct CirclerJob : IJobProcessComponentData<
+        Circler,
+        Position
+    >
+    {
+        [ReadOnly]
+        public float DeltaTime;
 
-            c.Time += 2 * Mathf.PI * Time.deltaTime / c.Period;
+        public void Execute(
+            ref Circler circler,
+            ref Position position
+        )
+        {
+            circler.Time += DeltaTime * circler.Frequency * Mathf.PI * 2;
 
-            var offset = new Vector3(
-                Mathf.Cos(c.Time),
-                Mathf.Sin(c.Time),
+            var pos = new float3(
+                math.cos(circler.Time),
+                math.sin(circler.Time),
                 0
-            ) * c.Amplitude;
+            ) * circler.Amplitude;
 
-            t.Translate(
-                offset - c.Offset,
-                Space.Self
-            );
-
-            c.Offset = offset;
+            position.Value += pos - circler.Position;
+            circler.Position = pos;
         }
-    }*/
+    }
 }
 
-public struct Circler : IComponentData, IResetable
+[Serializable]
+public struct Circler : IComponentData
 {
-    public float Period, Amplitude;
+    public float Frequency, Amplitude;
     [HideInInspector]
     public float Time;
     [HideInInspector]
-    public Vector3 Offset;
-
-    public void Disable()
-    {
-        Time = 0;
-        Offset = Vector3.right * Amplitude;
-    }
+    public float3 Position;
 
     public void Enable() { }
 }
